@@ -1,0 +1,167 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMdF125BqUG5H7mz4W5od0Y",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/221230049-web/221230049-Pengantar-ML/blob/main/week_02/Latihan_pratikum_1_list_dictionary_ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "1.OPERASI LIST dan DICTIONARY"
+      ],
+      "metadata": {
+        "id": "hpYqmaPznzhl"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "A. OPERASI LIST"
+      ],
+      "metadata": {
+        "id": "W-VbrDyytUOk"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Data mentah dari sensor\n",
+        "data_suhu = [23.5, 24.1, 22.8, 25.3, 21.9, 26.7, 20.5, 24.8, 23.2, 25.9]\n",
+        "\n",
+        "# 1. Filter nilai 22–25 derajat\n",
+        "# (pakai list comprehension + kondisi langsung)\n",
+        "suhu_ok = [val for val in data_suhu if 22 <= val <= 25]\n",
+        "\n",
+        "# 2. Normalisasi min-max ke 0–1\n",
+        "mn, mx = min(data_suhu), max(data_suhu)\n",
+        "suhu_norm = [(v - mn) / (mx - mn) for v in data_suhu]\n",
+        "\n",
+        "# 3. Moving average window 3 (pakai enumerate agar beda gaya)\n",
+        "def hitung_rata_bergerak(arr, n=3):\n",
+        "    return [\n",
+        "        sum(arr[i:i+n]) / n\n",
+        "        for i, _ in enumerate(arr[:-n+1])\n",
+        "    ]\n",
+        "\n",
+        "rata3 = hitung_rata_bergerak(data_suhu, 3)\n",
+        "\n",
+        "# Cetak hasil sesuai format yang diminta\n",
+        "print(\"Raw data:\", data_suhu)\n",
+        "print(\"Filtered data (22-25):\", suhu_ok)\n",
+        "print(\"Normalized data:\", [round(x,3) for x in suhu_norm])\n",
+        "print(\"Moving average (window=3):\", [round(x,3) for x in rata3])\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "guNqYqhcvWp1",
+        "outputId": "86834220-c379-4d14-b267-00a0a359d0c1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Raw data: [23.5, 24.1, 22.8, 25.3, 21.9, 26.7, 20.5, 24.8, 23.2, 25.9]\n",
+            "Filtered data (22-25): [23.5, 24.1, 22.8, 24.8, 23.2]\n",
+            "Normalized data: [0.484, 0.581, 0.371, 0.774, 0.226, 1.0, 0.0, 0.694, 0.435, 0.871]\n",
+            "Moving average (window=3): [23.467, 24.067, 23.333, 24.633, 23.033, 24.0, 22.833, 24.633]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "B. OPERASI DICTIONARY\n"
+      ],
+      "metadata": {
+        "id": "o9A3Zt8XtTG9"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Dataset contoh\n",
+        "data_sampel = [\n",
+        "    {\"fitur\": [1.2, 3.4, 2.1], \"kelas\": \"class_A\"},\n",
+        "    {\"fitur\": [2.3, 1.5, 4.2], \"kelas\": \"class_B\"},\n",
+        "    {\"fitur\": [3.1, 2.8, 1.9], \"kelas\": \"class_A\"},\n",
+        "    {\"fitur\": [4.2, 3.9, 2.5], \"kelas\": \"class_B\"},\n",
+        "]\n",
+        "\n",
+        "# 1. Kelompokkan data berdasarkan kelas\n",
+        "kelompok_fitur = {}\n",
+        "for entri in data_sampel:\n",
+        "    kls = entri[\"kelas\"]\n",
+        "    fitur = entri[\"fitur\"]\n",
+        "    kelompok_fitur.setdefault(kls, []).append(fitur)\n",
+        "\n",
+        "# 2. Hitung rata-rata setiap kolom fitur per kelas\n",
+        "rata_fitur_per_kelas = {}\n",
+        "for kls, daftar_fitur in kelompok_fitur.items():\n",
+        "    # zip(*daftar_fitur) untuk transpos agar per kolom\n",
+        "    kolom = list(zip(*daftar_fitur))\n",
+        "    # rata-rata tiap kolom\n",
+        "    rata2 = [sum(c)/len(c) for c in kolom]\n",
+        "    rata_fitur_per_kelas[kls] = rata2\n",
+        "\n",
+        "# 3. Cetak hasil sesuai format\n",
+        "print(\"Grouped data by label:\")\n",
+        "for kls, daftar_fitur in kelompok_fitur.items():\n",
+        "    print(f\"{kls}: {daftar_fitur}\")\n",
+        "\n",
+        "print(\"\\nAverage features per class:\")\n",
+        "for kls, rata2 in rata_fitur_per_kelas.items():\n",
+        "    print(f\"{kls}: { [round(x,2) for x in rata2] }\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "l2V6x_Potrs4",
+        "outputId": "7a5cd10a-ab20-4e22-d11a-f699b40c9816"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Grouped data by label:\n",
+            "class_A: [[1.2, 3.4, 2.1], [3.1, 2.8, 1.9]]\n",
+            "class_B: [[2.3, 1.5, 4.2], [4.2, 3.9, 2.5]]\n",
+            "\n",
+            "Average features per class:\n",
+            "class_A: [2.15, 3.1, 2.0]\n",
+            "class_B: [3.25, 2.7, 3.35]\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
