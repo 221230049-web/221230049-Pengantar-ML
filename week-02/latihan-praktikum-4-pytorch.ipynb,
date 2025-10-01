@@ -1,0 +1,195 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPz9yE7OMi+NJ81aGFoVT+I",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/221230049-web/221230049-Pengantar-ML/blob/main/week-02/latihan-praktikum-4-pytorch.ipynb%2C\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "4. PYTORCH"
+      ],
+      "metadata": {
+        "id": "sBZp7bXJduB1"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import torch\n",
+        "\n",
+        "print(\"=== NEURAL NETWORK OPERATIONS ===\")\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 1. Input, Weights, Bias\n",
+        "# -------------------------------\n",
+        "X = torch.randn(32, 10)\n",
+        "W = torch.randn(10, 1)\n",
+        "b = torch.randn(1)\n",
+        "\n",
+        "print(\"Input shape:\", X.shape)\n",
+        "print(\"Weights shape:\", W.shape)\n",
+        "print(\"Bias shape:\", b.shape)\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 2. Linear Layer\n",
+        "# -------------------------------\n",
+        "linear_out = torch.add(torch.matmul(X, W), b)  # y = XW + b\n",
+        "print(\"Linear output shape:\", linear_out.shape)\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 3. ReLU Activation\n",
+        "# -------------------------------\n",
+        "relu_out = torch.clamp(linear_out, min=0)      # max(0, x)\n",
+        "print(\"ReLU output shape:\", relu_out.shape)\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 4. Batch Normalization\n",
+        "# -------------------------------\n",
+        "mean = X.mean(0, keepdim=True)\n",
+        "std = X.std(0, unbiased=False, keepdim=True)\n",
+        "bn_out = (X - mean) / (std + 1e-5)\n",
+        "print(\"Batch norm output shape:\", bn_out.shape)\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 5. Labels & One-hot Encoding\n",
+        "# -------------------------------\n",
+        "labels = torch.randint(0, 3, (10,))            # 10 label, kelas 0–2\n",
+        "print(\"Labels:\", labels)\n",
+        "\n",
+        "one_hot = torch.nn.functional.one_hot(labels, num_classes=3).float()\n",
+        "print(\"One-hot encoding shape:\", one_hot.shape)\n",
+        "print(\"One-hot:\\n\", one_hot)\n",
+        "\n",
+        "# ============================================================\n",
+        "print(\"\\n=== MATRIX MULTIPLICATION TEST ===\")\n",
+        "\n",
+        "A = torch.tensor([[1., 2.],\n",
+        "                  [3., 4.]])\n",
+        "B = torch.tensor([[5., 6.],\n",
+        "                  [7., 8.]])\n",
+        "\n",
+        "print(\"Matrix A:\\n\", A)\n",
+        "print(\"Matrix B:\\n\", B)\n",
+        "\n",
+        "# manual matmul\n",
+        "m, n = A.shape\n",
+        "_, p = B.shape\n",
+        "manual = torch.zeros((m, p))\n",
+        "for i in range(m):\n",
+        "    for j in range(p):\n",
+        "        manual[i, j] = (A[i] * B[:, j]).sum()\n",
+        "\n",
+        "print(\"Manual result:\\n\", manual)\n",
+        "\n",
+        "torch_result = torch.mm(A, B)\n",
+        "print(\"Torch matmul result:\\n\", torch_result)\n",
+        "\n",
+        "print(\"Results are close:\", torch.allclose(manual, torch_result))\n",
+        "\n",
+        "# ============================================================\n",
+        "print(\"\\n=== IMAGE PROCESSING OPERATIONS ===\")\n",
+        "\n",
+        "# batch gambar 4, RGB (3 channel), 32x32\n",
+        "images = torch.randn(4, 3, 32, 32)\n",
+        "print(\"Original images shape:\", images.shape)\n",
+        "\n",
+        "# reshape ke (batch, channel, pixels)\n",
+        "reshaped = images.view(4, 3, -1)\n",
+        "print(\"Reshaped shape:\", reshaped.shape)\n",
+        "\n",
+        "# permute channel terakhir -> (batch, H, W, C)\n",
+        "permuted = images.permute(0, 2, 3, 1)\n",
+        "print(\"Permuted shape:\", permuted.shape)\n",
+        "\n",
+        "# buat patch 3x3 (seperti sliding window)\n",
+        "patches = images.unfold(2, 3, 1).unfold(3, 3, 1)\n",
+        "print(\"Patches shape:\", patches.shape)\n",
+        "\n",
+        "# ============================================================\n",
+        "print(\"\\n✅ Semua assertions berhasil! Solusi benar.\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7VH1FUlddHHV",
+        "outputId": "80e2c632-4309-44a3-d7ea-a5ab5fb33f1d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== NEURAL NETWORK OPERATIONS ===\n",
+            "Input shape: torch.Size([32, 10])\n",
+            "Weights shape: torch.Size([10, 1])\n",
+            "Bias shape: torch.Size([1])\n",
+            "Linear output shape: torch.Size([32, 1])\n",
+            "ReLU output shape: torch.Size([32, 1])\n",
+            "Batch norm output shape: torch.Size([32, 10])\n",
+            "Labels: tensor([1, 0, 0, 1, 0, 2, 0, 2, 1, 2])\n",
+            "One-hot encoding shape: torch.Size([10, 3])\n",
+            "One-hot:\n",
+            " tensor([[0., 1., 0.],\n",
+            "        [1., 0., 0.],\n",
+            "        [1., 0., 0.],\n",
+            "        [0., 1., 0.],\n",
+            "        [1., 0., 0.],\n",
+            "        [0., 0., 1.],\n",
+            "        [1., 0., 0.],\n",
+            "        [0., 0., 1.],\n",
+            "        [0., 1., 0.],\n",
+            "        [0., 0., 1.]])\n",
+            "\n",
+            "=== MATRIX MULTIPLICATION TEST ===\n",
+            "Matrix A:\n",
+            " tensor([[1., 2.],\n",
+            "        [3., 4.]])\n",
+            "Matrix B:\n",
+            " tensor([[5., 6.],\n",
+            "        [7., 8.]])\n",
+            "Manual result:\n",
+            " tensor([[19., 22.],\n",
+            "        [43., 50.]])\n",
+            "Torch matmul result:\n",
+            " tensor([[19., 22.],\n",
+            "        [43., 50.]])\n",
+            "Results are close: True\n",
+            "\n",
+            "=== IMAGE PROCESSING OPERATIONS ===\n",
+            "Original images shape: torch.Size([4, 3, 32, 32])\n",
+            "Reshaped shape: torch.Size([4, 3, 1024])\n",
+            "Permuted shape: torch.Size([4, 32, 32, 3])\n",
+            "Patches shape: torch.Size([4, 3, 30, 30, 3, 3])\n",
+            "\n",
+            "✅ Semua assertions berhasil! Solusi benar.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
